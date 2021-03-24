@@ -1,0 +1,101 @@
+<html lang="en">
+
+<head>
+    <title>Add Skills </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.serializejson.js"></script>
+    <script type="text/javascript">
+        var counter = 0;
+
+        function moreSkills() {
+            counter++;
+            var newFields = document.getElementById('skill').cloneNode(true);
+            newFields.id = '';
+            newFields.style.display = 'block';
+            var newField = newFields.childNodes;
+            for (var i=0;i<newField.length;i++) {
+                var theName = newField[i].name
+                if (theName)
+                    newField[i].name = "skills[" + theName;
+            }
+            var insertHere = document.getElementById('writeroot');
+            insertHere.parentNode.insertBefore(newFields,insertHere);
+        }
+
+        function showValues() {
+            var obj = $('form').serializeJSON();
+            $( "#results" ).text( JSON.stringify(obj) );
+        }
+
+
+
+        document.addEventListener('submit', function (event) {
+            event.preventDefault();
+            showValues();
+            fetch('http://localhost:8080/users', {
+                method: 'POST',
+                body: JSON.stringify($('form').serializeJSON()),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            }).then(function (response) {
+                if (response.ok) {
+                    return response.json();
+                }
+                return Promise.reject(response);
+            }).then(function (data) {
+                console.log(data);
+            }).catch(function (error) {
+                console.warn(error);
+            });
+        });
+
+
+
+    </script>
+</head>
+
+
+<body>
+<p>Add the name of the skill you have and select the level of it</a></p><br>
+
+<div id="skill" style="display: none">
+    <input type="button" value="Remove skill"
+           onclick="this.parentNode.parentNode.removeChild(this.parentNode);" /><br /><br />
+
+    <input name="][name]" value="title" />
+
+    <select name="][level]">
+        <option>level</option>
+        <option value="EXPERT">EXPERT</option>
+        <option value="PRACTITIONER">PRACTITIONER</option>
+        <option value="WORKING">WORKING</option>
+        <option value="AWARENESS">AWARENESS</option>
+    </select><br /><br />
+</div>
+
+<form id="myForm" enctype="">
+    <div id="skill0" style="display: block">
+
+        <input name="skills[][name]" value="title" />
+
+        <select name="skills[][level]">
+            <option>level</option>
+            <option value="EXPERT">EXPERT</option>
+            <option value="PRACTITIONER">PRACTITIONER</option>
+            <option value="WORKING">WORKING</option>
+            <option value="AWARENESS">AWARENESS</option>
+        </select><br /><br />
+    </div>
+    <span id="writeroot"></span>
+
+    <input type="button"  id="addSkill" value="+ More Skills" onclick="moreSkills()"/>
+    <input type="submit" value="Submit" />
+</form>
+
+<p><tt id="results"></tt></p>
+
+
+</body>
+</html>
